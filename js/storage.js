@@ -6,7 +6,7 @@
 const STORE_KEY = 'bible-companion-v1';
 
 const Storage = {
-  state: { progress: {}, notes: {}, gameData: {}, lastReadDate: null, streak: 0, mode: 'read' },
+  state: { progress: {}, notes: {}, gameData: {}, lastReadDate: null, streak: 0, mode: 'read', theme: 'light', bibleVersion: 'KJV' },
 
   load() {
     try {

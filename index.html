@@ -3,14 +3,17 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#a9793f">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Code Bible">
 <title>Code Bible</title>
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/style.css?v=2">
 </head>
 <body>
 <div class="app">
@@ -19,13 +22,9 @@
     <p class="eyebrow">Daily reading companion</p>
     <h1 class="title">Code Bible</h1>
     <p class="subtitle">Every book, one chapter at a time</p>
+    <button id="themeToggle" class="theme-toggle" type="button">Dark mode</button>
+    <p class="mode-header" id="modeHeader">Game mode: play matching sets and quizzes.</p>
   </header>
-
-  <div class="modes">
-    <button class="mode-btn" data-mode="game">Game mode</button>
-    <button class="mode-btn" data-mode="read">Read mode</button>
-    <button class="mode-btn" data-mode="bible">Bible mode</button>
-  </div>
 
   <div class="view active" id="view-library">
     <div class="stats-row">
@@ -35,6 +34,29 @@
     <div class="progress-track"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
     <input class="search" id="bookSearch" placeholder="Search for a book&hellip;">
     <div id="bookList"></div>
+  </div>
+
+  <div class="view" id="view-games">
+    <h2 class="serif">Games</h2>
+    <p class="hint">Choose a game to play.</p>
+    <div class="games-grid">
+      <button class="game-card" data-game="sudoku">
+        <div class="gc-title">Sudoku</div>
+        <div class="gc-sub">Logic number puzzle</div>
+      </button>
+      <button class="game-card" data-game="crossword">
+        <div class="gc-title">Crossword</div>
+        <div class="gc-sub">Fill-in word puzzle</div>
+      </button>
+      <button class="game-card" data-game="matching">
+        <div class="gc-title">Matching</div>
+        <div class="gc-sub">Match pairs from the chapter</div>
+      </button>
+      <button class="game-card" data-game="quiz">
+        <div class="gc-title">Quick Quiz</div>
+        <div class="gc-sub">Five-question multiple choice</div>
+      </button>
+    </div>
   </div>
 
   <div class="view" id="view-chapters">
@@ -50,11 +72,58 @@
     <div id="detailBody"></div>
   </div>
 
+  <div class="view" id="view-settings">
+    <button class="back-btn" id="backFromSettings">&larr; Settings</button>
+    <h2>Settings</h2>
+    <div class="settings-section">
+      <label class="field-label">Bible Version</label>
+      <div class="version-grid" id="versionGrid"></div>
+      <p class="hint">Select a Bible translation. Your choice is saved automatically.</p>
+    </div>
+  </div>
+
+  <div class="view" id="view-notes">
+    <button class="back-btn" id="backFromNotes">&larr; Notes</button>
+    <h2>Notes & Devotions</h2>
+    <p class="hint">Personal notes and devotion entries you save per chapter will appear here.</p>
+    <div id="notesList"></div>
+  </div>
+
+  <div class="view" id="view-friends">
+    <button class="back-btn" id="backFromFriends">&larr; Friends</button>
+    <h2>Friends</h2>
+    <p class="hint">Friend features and sharing coming soon.</p>
+  </div>
+
 </div>
 
-<script src="js/data.js"></script>
-<script src="js/storage.js"></script>
-<script src="js/games.js"></script>
-<script src="js/app.js"></script>
+<div class="bottom-nav">
+  <div class="bottom-actions">
+    <div class="left-actions">
+      <button class="icon-btn" data-mode="game" title="Games">🎰</button>
+      <button class="icon-btn" data-mode="read" title="Read">📖</button>
+      <button class="icon-btn" data-mode="bible" title="Bible">✝️</button>
+    </div>
+    <div class="right-actions">
+      <button class="icon-btn" data-mode="notes" title="Notes">📝</button>
+      <button class="icon-btn" data-mode="friends" title="Friends">👥</button>
+      <button class="settings-btn icon-btn" id="settingsBtn" title="Settings">⚙️</button>
+    </div>
+  </div>
+</div>
+
+<script src="js/data.js?v=2"></script>
+<script src="js/storage.js?v=2"></script>
+<script src="js/games.js?v=2"></script>
+<script src="js/bible.js?v=2"></script>
+<script src="js/app.js?v=2"></script>
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.getRegistrations().then(registrations => {
+      registrations.forEach(reg => reg.unregister());
+    }).catch(() => {});
+    navigator.serviceWorker.register('sw.js').catch(() => {});
+  }
+</script>
 </body>
 </html>

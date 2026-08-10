@@ -6,21 +6,85 @@
   --good:#4c7a4c; --good-tint:#e3ecdf;
   --bad:#a8452f; --bad-tint:#f6e3de;
   --game:#5b6f9e; --game-tint:#e4e8f4;
+  --nav-background: rgba(255,255,255,0.94);
+}
+body.theme-dark {
+  --ink:#f1f4f7; --ink-soft:#b0b8c8; --ink-faint:#8fa0b3;
+  --parchment:#101520; --parchment-raised:#192132;
+  --brass:#d7b27f; --brass-deep:#f5da9d; --brass-tint:#232a38;
+  --line: rgba(255,255,255,0.1); --line-strong: rgba(255,255,255,0.18);
+  --good:#7cc47a; --good-tint:#213229;
+  --bad:#e28c81; --bad-tint:#3d1f1b;
+  --game:#8fa7d5; --game-tint:#1f2b43;
+  --nav-background: rgba(16,21,32,0.92);
 }
 *{box-sizing:border-box;} html,body{margin:0;padding:0;}
-body{background:var(--parchment); color:var(--ink); font-family:'Inter',sans-serif; min-height:100vh; padding-bottom:3rem;}
+body{background:var(--parchment); color:var(--ink); font-family:'Inter',sans-serif; min-height:100vh; padding:env(safe-area-inset-top,1rem) env(safe-area-inset-right,1rem) env(safe-area-inset-bottom,1rem) env(safe-area-inset-left,1rem);}
 h1,h2,h3,.serif{font-family:'Source Serif 4',serif;}
 button{font-family:inherit;}
-.app{max-width:520px; margin:0 auto; padding:0 18px;}
+.app{max-width:520px; margin:0 auto; padding:1rem 18px calc(110px + env(safe-area-inset-bottom,16px)); min-height:100vh;}
 
-header.top{padding:22px 0 14px;}
+header.top{position:relative; padding:22px 0 14px; background:var(--parchment-raised); border-bottom:1px solid var(--line);}
 .eyebrow{font-size:12px; letter-spacing:0.12em; text-transform:uppercase; color:var(--brass-deep); font-weight:600; margin:0 0 4px;}
 h1.title{font-size:26px; font-weight:600; margin:0 0 2px;}
 .subtitle{font-size:13px; color:var(--ink-soft); margin:0;}
+.theme-toggle{margin:12px 0 0; padding:10px 14px; border-radius:999px; border:1px solid var(--line); background:var(--parchment-raised); color:var(--ink); font-size:13px; font-weight:600; cursor:pointer;}
+.mode-header{font-size:13px; color:var(--ink-soft); margin:8px 0 14px;}
 
-.modes{display:flex; gap:8px; margin:16px 0 10px; border-bottom:1px solid var(--line); padding-bottom:14px;}
-.mode-btn{flex:1; padding:11px 4px; border-radius:10px; border:1px solid var(--line); background:var(--parchment-raised); color:var(--ink-soft); font-size:13px; font-weight:600; cursor:pointer;}
-.mode-btn.active{background:var(--ink); color:#fff; border-color:var(--ink);}
+.bottom-nav{
+  position:fixed;
+  left:0;
+  right:0;
+  bottom:0;
+  height:84px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  width:100%;
+  pointer-events:auto;
+  z-index:20000;
+  background:transparent;
+}
+.bottom-nav > *{
+  width:100%;
+  max-width:520px;
+  margin:0 auto;
+  height:100%;
+  padding:8px 12px env(safe-area-inset-bottom,10px);
+  background:var(--nav-background);
+  border-top:1px solid var(--line);
+  display:flex;
+  gap:10px;
+  box-shadow:0 -10px 30px rgba(34,48,63,0.06);
+  justify-content:space-between;
+  align-items:center;
+}
+.left-actions{display:flex; gap:8px;}
+.right-actions{display:flex; gap:8px;}
+.bottom-nav .icon-btn{width:56px; height:56px; display:inline-flex; align-items:center; justify-content:center; padding:0; border-radius:10px; background:var(--parchment-raised); border:1px solid var(--line); font-size:22px}
+.bottom-nav .icon-btn.active{background:var(--brass); color:#fff;}
+
+/* Games grid */
+.games-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:12px; margin-top:12px;}
+.game-card{background:var(--parchment-raised); border:1px solid var(--line); border-radius:12px; padding:18px; text-align:center; cursor:pointer;}
+.gc-title{font-weight:700; font-size:16px; margin-bottom:6px}
+.gc-sub{font-size:13px; color:var(--ink-soft)}
+
+/* chapter row expansion styles */
+.row{position:relative; transition:transform .12s ease, box-shadow .12s ease;}
+.row.expanded{transform:scale(1.02); box-shadow:0 6px 18px rgba(34,48,63,0.08);}
+.row-actions{position:absolute; right:12px; top:8px; display:none; gap:8px;}
+.row-actions .play-btn{padding:8px 10px;}
+
+.settings-section{margin-bottom:26px;}
+.version-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:10px;}
+.version-btn{padding:16px; background:var(--parchment-raised); border:1.5px solid var(--line); border-radius:12px; cursor:pointer; font-size:14px; font-weight:600; color:var(--ink); transition:all .2s;}
+.version-btn:hover{background:var(--brass-tint);}
+.version-btn.active{background:var(--brass); color:#fff; border-color:var(--brass);}
+
+.bible-load-state, .bible-error{background:var(--parchment-raised); border:1px solid var(--line); border-radius:12px; padding:14px; color:var(--ink-soft); margin-bottom:14px;}
+.bible-text{background:var(--parchment-raised); border:1px solid var(--line); border-radius:12px; padding:16px; color:var(--ink); line-height:1.75;}
+.verse-number{font-weight:700; color:var(--ink-soft); margin-right:8px;}
 
 .stats-row{display:flex; gap:10px; margin:16px 0 4px;}
 .stat{flex:1; background:var(--parchment-raised); border:1px solid var(--line); border-radius:10px; padding:11px 13px;}

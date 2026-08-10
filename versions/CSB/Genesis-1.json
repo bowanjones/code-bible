@@ -1,0 +1,14 @@
+{
+  "reference": "Genesis 1 (CSB)",
+  "copyright": "Christian Standard Bible",
+  "verses": [
+    { "verse": 1, "text": "In the beginning God created the heavens and the earth." },
+    { "verse": 2, "text": "Now the earth was formless and empty, darkness covered the surface of the deep, and the Spirit of God was hovering over the surface of the waters." },
+    { "verse": 3, "text": "Then God said, \"Let there be light,\" and there was light." },
+    { "verse": 4, "text": "God saw that the light was good, and God separated the light from the darkness." },
+    { "verse": 5, "text": "God called the light \"day\" and the darkness \"night.\" Evening came and then morning: the first day." },
+    { "verse": 6, "text": "Then God said, \"Let there be an expanse between the waters, separating water from water.\"" },
+    { "verse": 7, "text": "So God made the expanse and separated the water under the expanse from the water above the expanse. And it was so." },
+    { "verse": 8, "text": "God called the expanse \"sky.\" Evening came and then morning: the second day." }
+  ]
+}
