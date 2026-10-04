@@ -96,3 +96,98 @@ function runQuiz(mountEl, quiz, onDone) {
   }
   renderQ();
 }
+
+// ---------- Library-wide Matching & Quiz ----------
+// Chapter game packs (imported via a chapter's Game tab — see app.js
+// renderDetail) each hold a few matching sections and a quiz. Rather than
+// requiring a bespoke pack for every single chapter (impractical — there
+// are thousands of chapters), these two pull together whatever packs
+// actually exist into one shared pool, with a toggle for "only chapters
+// I've read" vs "everything imported so far."
+function gameDataChapterKeys(scope) {
+  return Object.keys(Storage.state.gameData).filter(k => scope === 'all' || Storage.state.progress[k]);
+}
+
+function emptyPoolMessage(scope, kind) {
+  const scopeNote = scope === 'read' ? " from chapters you've read" : '';
+  return `<p class="hint">No ${kind} available yet${scopeNote}. Import a game pack from a chapter's Game tab in the Bible tab, or switch to "All chapters."</p>`;
+}
+
+GameRegistry.register({
+  id: 'matching',
+  title: 'Matching',
+  sub: 'Match pairs pulled from your imported chapter packs',
+  mount(container) {
+    let scope = 'read';
+    const wrap = document.createElement('div');
+    container.appendChild(wrap);
+
+    function pool() {
+      const pairs = [];
+      gameDataChapterKeys(scope).forEach(k => {
+        (Storage.state.gameData[k].sections || []).forEach(sec => {
+          (sec.matching.pairs || []).forEach(p => pairs.push(p));
+        });
+      });
+      return pairs;
+    }
+
+    function render() {
+      const pairs = pool();
+      wrap.innerHTML = `<div class="segmented" id="matchScopeTabs" style="margin-bottom:14px;">
+        <button class="seg-btn${scope === 'read' ? ' active' : ''}" data-scope="read">Read chapters</button>
+        <button class="seg-btn${scope === 'all' ? ' active' : ''}" data-scope="all">All chapters</button>
+      </div>`;
+      if (pairs.length < 2) {
+        wrap.innerHTML += emptyPoolMessage(scope, 'matching pairs');
+      } else {
+        const chosen = shuffle(pairs).slice(0, Math.min(8, pairs.length));
+        const matching = { prompt: 'Tap a left item, then its match on the right.', pairs: chosen };
+        wrap.innerHTML += renderMatchingHTML(matching, 'libMatchGrid') +
+          '<button class="secondary-btn" id="matchReshuffle" style="margin-top:14px;">New set</button>';
+        bindMatching('libMatchGrid', matching);
+        document.getElementById('matchReshuffle').onclick = render;
+      }
+      wrap.querySelectorAll('#matchScopeTabs .seg-btn').forEach(b => {
+        b.onclick = () => { scope = b.dataset.scope; render(); };
+      });
+    }
+    render();
+    return { unmount() {} };
+  }
+});
+
+GameRegistry.register({
+  id: 'quiz',
+  title: 'Quick Quiz',
+  sub: "A mix of questions auto-built from everything you've read",
+  mount(container) {
+    const wrap = document.createElement('div');
+    container.appendChild(wrap);
+
+    function load() {
+      wrap.innerHTML = '<p class="hint">Building your quiz&hellip;</p>';
+      ChapterQuiz.generateAcrossRead(2, 6).then(qs => {
+        if (!qs.length) {
+          wrap.innerHTML = '<p class="hint">Read a chapter or two first \u2014 this quiz pulls its questions from what you\u2019ve actually read.</p>';
+          return;
+        }
+        wrap.innerHTML = '';
+        const mountEl = document.createElement('div');
+        wrap.appendChild(mountEl);
+        const retryBtn = document.createElement('button');
+        retryBtn.type = 'button';
+        retryBtn.className = 'secondary-btn';
+        retryBtn.style.marginTop = '14px';
+        retryBtn.textContent = 'New set';
+        retryBtn.onclick = load;
+        runQuiz(mountEl, qs.slice(0, Math.min(8, qs.length)));
+        wrap.appendChild(retryBtn);
+      }).catch(() => {
+        wrap.innerHTML = '<p class="hint">Couldn\u2019t build a quiz right now \u2014 check your connection and try again.</p>';
+      });
+    }
+    load();
+    return { unmount() {} };
+  }
+});

@@ -1,0 +1,14 @@
+{
+  "reference": "Genesis 1 (NLT)",
+  "copyright": "New Living Translation",
+  "verses": [
+    { "verse": 1, "text": "In the beginning God created the heavens and the earth." },
+    { "verse": 2, "text": "The earth was formless and empty, and darkness covered the deep waters. And the Spirit of God was hovering over the surface of the waters." },
+    { "verse": 3, "text": "Then God said, \"Let there be light,\" and there was light." },
+    { "verse": 4, "text": "And God saw that the light was good. Then he separated the light from the darkness." },
+    { "verse": 5, "text": "God called the light \"day\" and the darkness \"night.\" And evening passed and morning came, marking the first day." },
+    { "verse": 6, "text": "Then God said, \"Let there be a space between the waters, to separate the waters of the heavens from the waters of the earth.\"" },
+    { "verse": 7, "text": "And that is what happened. God made this space to separate the waters of the earth from the waters of the heavens." },
+    { "verse": 8, "text": "God called the space \"sky.\" And evening passed and morning came, marking the second day." }
+  ]
+}
