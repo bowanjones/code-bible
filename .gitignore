@@ -3,3 +3,7 @@ Thumbs.db
 node_modules/
 .vscode/
 *.log
+versions/NIV/
+versions/ESV/
+versions/NLT/
+versions/CSB/
