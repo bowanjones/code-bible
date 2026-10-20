@@ -832,6 +832,18 @@ function renderSettings() {
   });
   applyTextSize(Storage.state.textSize || 'medium');
   $('dataStatus').textContent = '';
+  if (typeof Cloud !== 'undefined' && Cloud) Cloud.renderAccount();
+}
+
+// Called by cloud.js after it pulled newer data from the account. Re-applies
+// appearance and redraws the screen if it's a top-level one; reading and game
+// screens are left alone so nothing jumps under the reader.
+function refreshAfterSync() {
+  applyTheme(Storage.state.theme || 'light');
+  applyTextSize(Storage.state.textSize || 'medium');
+  const active = document.querySelector('.view.active');
+  const tabs = { 'view-story': 'story', 'view-library': 'bible', 'view-hub': 'hub', 'view-friends': 'friends', 'view-settings': 'settings' };
+  if (active && tabs[active.id]) showTab(tabs[active.id]);
 }
 
 function exportData() {
@@ -866,9 +878,20 @@ function importDataFromFile(file) {
   reader.readAsText(file);
 }
 
-function resetAllProgress() {
-  if (!confirm('Reset everything on this device? This clears reading progress, notes, devotionals, high scores and friends, and can\u2019t be undone.')) return;
+async function resetAllProgress() {
+  const signedIn = typeof Cloud !== 'undefined' && Cloud && Cloud.isSignedIn();
+  const where = signedIn ? 'on this device AND in your account' : 'on this device';
+  if (!confirm(`Reset everything ${where}? This clears reading progress, notes, devotionals, high scores and friends, and can\u2019t be undone.`)) return;
+  if (signedIn) {
+    // Clear the cloud copy first, otherwise the next sync would just restore it.
+    const cleared = await Cloud.clearCloudData();
+    if (!cleared) {
+      toast('Couldn\u2019t reach your account, so nothing was reset. Try again when you\u2019re online.');
+      return;
+    }
+  }
   try { localStorage.removeItem(STORE_KEY); } catch (e) { /* ignore */ }
+  if (typeof Cloud !== 'undefined' && Cloud) Cloud.forgetSyncState();
   location.reload();
 }
 
@@ -959,6 +982,13 @@ function init() {
   Storage.load();
   applyTheme(Storage.state.theme || 'light');
   applyTextSize(Storage.state.textSize || 'medium');
+
+  // Optional account + cloud backup (cloud.js). Everything keeps working
+  // locally if this is unavailable or nobody signs in.
+  if (typeof Cloud !== 'undefined' && Cloud) {
+    Cloud.onStateChanged = refreshAfterSync;
+    Cloud.init();
+  }
 
   // bottom nav
   document.querySelectorAll('.bottom-nav .icon-btn[data-tab]').forEach(b => {

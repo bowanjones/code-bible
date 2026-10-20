@@ -1,9 +1,9 @@
-const CACHE_NAME = 'code-bible-v22';
+const CACHE_NAME = 'code-bible-v23';
 const CACHE_URLS = [
   '.',
   'index.html',
   'manifest.json',
-  'css/style.css?v=15',
+  'css/style.css?v=16',
   'js/data.js?v=3',
   'js/storage.js?v=8',
   'js/games.js?v=5',
@@ -28,7 +28,8 @@ const CACHE_URLS = [
   'js/notes.js?v=5',
   'js/story-data.js?v=11',
   'js/story.js?v=6',
-  'js/app.js?v=16'
+  'js/cloud.js?v=1',
+  'js/app.js?v=17'
 ];
 
 self.addEventListener('install', event => {
@@ -48,6 +49,9 @@ self.addEventListener('activate', event => {
 });
 
 self.addEventListener('fetch', event => {
+  // Only handle same-origin GETs. Sign-in and cloud-sync traffic (Supabase) and
+  // CDN scripts must go straight to the network and never be cached here.
+  if (event.request.method !== 'GET' || new URL(event.request.url).origin !== self.location.origin) return;
   event.respondWith(
     caches.match(event.request).then(response => response || fetch(event.request))
   );

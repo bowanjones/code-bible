@@ -13,7 +13,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=15">
+<link rel="stylesheet" href="css/style.css?v=16">
 </head>
 <body>
 <div class="app">
@@ -240,9 +240,14 @@
       <p class="hint">Affects scripture and devotional reading text.</p>
     </div>
 
+    <div class="settings-section" id="accountSection">
+      <label class="field-label">Account</label>
+      <div id="accountBody"></div>
+    </div>
+
     <div class="settings-section">
       <label class="field-label">Your data</label>
-      <p class="hint">Everything here is stored only on this device, nowhere else — export a backup to keep it safe or move it to another device.</p>
+      <p class="hint">Your data is always saved on this device. Sign in above to also back it up to your account, or export a backup file to keep it safe or move it to another device.</p>
       <button class="secondary-btn" id="exportDataBtn" style="width:auto; padding:10px 16px; margin-right:8px;">Export my data</button>
       <button class="secondary-btn" id="importDataBtn" style="width:auto; padding:10px 16px;">Import data</button>
       <input type="file" id="importDataFile" accept="application/json" style="display:none;">
@@ -251,14 +256,14 @@
 
     <div class="settings-section">
       <label class="field-label">Reset</label>
-      <p class="hint">Clears all reading progress, notes, devotionals, high scores, and friends on this device. This can't be undone — export a backup first if you're not sure.</p>
+      <p class="hint">Clears all reading progress, notes, devotionals, high scores, and friends on this device — and in your account too, if you're signed in. This can't be undone — export a backup first if you're not sure.</p>
       <button class="secondary-btn" id="resetProgressBtn" style="width:auto; padding:10px 16px; color:var(--bad); border-color:var(--bad);">Reset all progress</button>
     </div>
   </div>
 
   <div class="view" id="view-friends">
     <h2 class="serif">Friends</h2>
-    <p class="hint">This is a personal list for now — there's no account system yet, so it lives only on this device and doesn't notify anyone automatically. Inviting and sharing use your phone or browser's own share sheet, so they work today even without a backend.</p>
+    <p class="hint">This is a personal list for now — it's saved with your account if you're signed in, but friends aren't linked accounts yet and nobody is notified automatically. Inviting and sharing use your phone or browser's own share sheet, so they work today even without a backend.</p>
 
     <p class="section-heading">Invite a friend</p>
     <p class="hint" style="margin-top:-6px;">Send someone a link to read along with you.</p>
@@ -349,7 +354,9 @@
 <script src="js/notes.js?v=5"></script>
 <script src="js/story-data.js?v=11"></script>
 <script src="js/story.js?v=6"></script>
-<script src="js/app.js?v=16"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.108.2"></script>
+<script src="js/cloud.js?v=1"></script>
+<script src="js/app.js?v=17"></script>
 <script>
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.getRegistrations().then(registrations => {
