@@ -1,0 +1,14 @@
+{
+  "reference": "Genesis 1 (NIV)",
+  "copyright": "New International Version",
+  "verses": [
+    { "verse": 1, "text": "In the beginning God created the heavens and the earth." },
+    { "verse": 2, "text": "Now the earth was formless and empty, darkness was over the surface of the deep, and the Spirit of God was hovering over the waters." },
+    { "verse": 3, "text": "And God said, \"Let there be light,\" and there was light." },
+    { "verse": 4, "text": "God saw that the light was good, and he separated the light from the darkness." },
+    { "verse": 5, "text": "God called the light \"day,\" and the darkness he called \"night.\" And there was evening, and there was morning—the first day." },
+    { "verse": 6, "text": "And God said, \"Let there be a vault between the waters to separate water from water.\"" },
+    { "verse": 7, "text": "So God made the vault and separated the water under the vault from the water above it. And it was so." },
+    { "verse": 8, "text": "God called the vault \"sky.\" And there was evening, and there was morning—the second day." }
+  ]
+}

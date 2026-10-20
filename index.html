@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#a9793f">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Code Bible">
+<title>Code Bible</title>
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css?v=16">
+</head>
+<body>
+<div class="app">
+
+  <header class="top">
+    <p class="eyebrow">Daily reading companion</p>
+    <h1 class="title">Code Bible</h1>
+    <p class="subtitle">Every book, one chapter at a time</p>
+    <button id="themeToggle" class="theme-toggle" type="button">Dark mode</button>
+  </header>
+
+  <!-- STORY: the home tab. Guided campaign through the Bible's narrative arcs. -->
+  <div class="view active" id="view-story">
+    <div class="stats-row">
+      <div class="stat"><div class="num" id="storyStatDone">0 / 1189</div><div class="lbl">Chapters read</div></div>
+      <div class="stat"><div class="num" id="storyStatStreak">0</div><div class="lbl">Day streak</div></div>
+    </div>
+    <div id="storyUpNext"></div>
+    <p class="section-heading">Arcs</p>
+    <div id="storyArcList"></div>
+  </div>
+
+  <div class="view" id="view-arc">
+    <button class="back-btn" id="backFromArc">&larr; Story</button>
+    <h2 class="serif" id="arcTitle" style="font-size:22px; margin:4px 0 2px;"></h2>
+    <p class="hint" id="arcRange" style="margin-top:0;"></p>
+    <div id="arcBeatList"></div>
+  </div>
+
+  <!-- STORY READING SCREEN: sticky Scripture/Notes tabs, no Game tab here —
+       games are their own beats. "Next" (fixed at the bottom) replaces the
+       mark-as-read toggle and advances straight into whatever comes next. -->
+  <div class="view story-read" id="view-story-read">
+    <button class="back-btn" id="backFromStoryRead">&larr; Story</button>
+    <h2 id="storyReadTitle" style="font-size:24px; margin:6px 0 2px;"></h2>
+    <p class="meta" id="storyReadLabel" style="font-size:13px; color:var(--ink-soft); margin:0 0 6px;"></p>
+    <div class="segmented sticky-seg" id="storyReadTabs">
+      <button class="seg-btn active" data-tab="scripture">Scripture</button>
+      <button class="seg-btn" data-tab="devotional">Devotional</button>
+      <button class="seg-btn" data-tab="notes">Notes</button>
+    </div>
+    <div id="storyReadBody"></div>
+  </div>
+
+  <!-- BIBLE: browse books/chapters, read scripture, take notes, play that chapter's game pack. -->
+  <div class="view" id="view-library">
+    <input class="search" id="bookSearch" placeholder="Search for a book&hellip;">
+    <div id="bookList"></div>
+  </div>
+
+  <div class="view" id="view-chapters">
+    <button class="back-btn" id="backToLibrary">&larr; All books</button>
+    <h2 class="serif" id="chaptersBookTitle" style="font-size:22px; margin:4px 0 6px;"></h2>
+    <button class="secondary-btn" id="markBookUnreadBtn" style="width:auto; margin:0 0 14px; padding:8px 12px;">Mark all unread</button>
+    <div id="chapterList"></div>
+  </div>
+
+  <div class="view detail" id="view-detail">
+    <button class="back-btn" id="backToChapters">&larr; <span id="backLabel"></span></button>
+    <h2 id="detailTitle"></h2>
+    <p class="meta" id="detailMeta"></p>
+    <div class="segmented" id="detailTabs">
+      <button class="seg-btn" data-tab="notes">Notes</button>
+      <button class="seg-btn" data-tab="scripture">Scripture</button>
+      <button class="seg-btn" data-tab="game">Game</button>
+    </div>
+    <div id="detailBody"></div>
+  </div>
+
+  <!-- LIBRARY: free play — every game and puzzle, unlocked or not, plus saved notes. -->
+  <div class="view" id="view-hub">
+    <h2 class="serif">Library</h2>
+    <div class="segmented" id="hubTabs">
+      <button class="seg-btn" data-hubtab="games">Games</button>
+      <button class="seg-btn" data-hubtab="devotionals">Devotionals</button>
+      <button class="seg-btn" data-hubtab="notes">Notes</button>
+    </div>
+
+    <div id="hubGames">
+      <p class="section-heading">Chapter games</p>
+      <div class="games-grid">
+        <button class="game-card" data-game="matching">
+          <div class="gc-title">Matching</div>
+          <div class="gc-sub">Match pairs from a chapter</div>
+        </button>
+        <button class="game-card" data-game="quiz">
+          <div class="gc-title">Quick Quiz</div>
+          <div class="gc-sub">A mix of questions from everything you've read</div>
+        </button>
+      </div>
+
+      <p class="section-heading">Word &amp; puzzle games</p>
+      <div class="games-grid">
+        <button class="game-card" data-game="fillblank">
+          <div class="gc-title">Fill in the Blank</div>
+          <div class="gc-sub">Complete the verse</div>
+        </button>
+        <button class="game-card" data-game="wordsearch">
+          <div class="gc-title">Word Search</div>
+          <div class="gc-sub">Find hidden Bible words</div>
+        </button>
+        <button class="game-card" data-game="versebuilder">
+          <div class="gc-title">Rebuild the Verse</div>
+          <div class="gc-sub">Put the words back in order</div>
+        </button>
+        <button class="game-card" data-game="unscramble">
+          <div class="gc-title">Unscramble</div>
+          <div class="gc-sub">Unscramble the letters to spell the word</div>
+        </button>
+        <button class="game-card" data-game="memorymatch">
+          <div class="gc-title">Memory Match</div>
+          <div class="gc-sub">Flip cards, find the pairs</div>
+        </button>
+        <button class="game-card" data-game="creationsort">
+          <div class="gc-title">Sort of Creation</div>
+          <div class="gc-sub">Name the day, then sort what God made</div>
+        </button>
+        <button class="game-card" data-game="sudoku">
+          <div class="gc-title">Sudoku</div>
+          <div class="gc-sub">Numbers, Bible-themed</div>
+        </button>
+        <button class="game-card" data-game="crossword">
+          <div class="gc-title">Crossword</div>
+          <div class="gc-sub">Solve each clue, letter by letter</div>
+        </button>
+        <button class="game-card" data-game="connectdots">
+          <div class="gc-title">Connect the Dots</div>
+          <div class="gc-sub">Tap the dots in order to reveal the picture</div>
+        </button>
+      </div>
+
+      <p class="section-heading">Arcade games</p>
+      <p class="hint" style="margin-top:-6px;">These unlock as you read — each one opens up once you reach that part of the story.</p>
+      <div class="games-grid">
+        <button class="game-card" data-game="gardentrail">
+          <div class="gc-title">Garden Trail</div>
+          <div class="gc-sub">Gather the garden's fruit</div>
+        </button>
+        <button class="game-card" data-game="farmplot">
+          <div class="gc-title">Tend the Ground</div>
+          <div class="gc-sub">Plow, plant, and harvest</div>
+        </button>
+        <button class="game-card" data-game="slingshot">
+          <div class="gc-title">David's Slingshot</div>
+          <div class="gc-sub">Aim for Goliath</div>
+        </button>
+        <button class="game-card" data-game="flappy">
+          <div class="gc-title">Flappy Dove</div>
+          <div class="gc-sub">Guide the dove home</div>
+        </button>
+        <button class="game-card" data-game="runner">
+          <div class="gc-title">Exodus Escape</div>
+          <div class="gc-sub">Outrun Pharaoh's chariots</div>
+        </button>
+        <button class="game-card" data-game="frogger">
+          <div class="gc-title">Jordan Crossing</div>
+          <div class="gc-sub">Cross the Jordan safely</div>
+        </button>
+        <button class="game-card" data-game="pacman">
+          <div class="gc-title">Manna Maze</div>
+          <div class="gc-sub">Gather manna in the wilderness</div>
+        </button>
+        <button class="game-card" data-game="galaga">
+          <div class="gc-title">Armor of God</div>
+          <div class="gc-sub">Suit up in the full armor</div>
+        </button>
+        <button class="game-card" data-game="towerdefense">
+          <div class="gc-title">Jericho Defense</div>
+          <div class="gc-sub">Hold the march around Jericho</div>
+        </button>
+      </div>
+    </div>
+
+    <div id="hubDevotionals" style="display:none;">
+      <p class="section-heading">Devotionals</p>
+      <p class="hint" style="margin-top:-6px;">Short reflections tied to what's in the story — tap one to read it and write your own response, any time, whether or not you've gotten there yet in Story mode.</p>
+      <div id="devotionalsList"></div>
+
+      <p class="section-heading">Study plans</p>
+      <p class="hint">Multi-day studies that aren't tied to a specific reading — coming soon.</p>
+    </div>
+
+    <div id="hubNotes" style="display:none;">
+      <p class="hint">Personal notes and devotion entries you save per chapter will appear here.</p>
+      <div class="note-sort-row" id="hubNotesSortRow" style="display:none;">
+        <span class="hint" style="margin:0;">Your notes</span>
+        <div class="segmented note-sort-seg">
+          <button class="seg-btn active" data-hubsort="newest">Newest</button>
+          <button class="seg-btn" data-hubsort="book">By book</button>
+        </div>
+      </div>
+      <div id="notesList"></div>
+    </div>
+  </div>
+
+  <div class="view" id="view-arcade">
+    <button class="back-btn" id="backFromArcade">&larr; Back</button>
+    <h2 class="serif" id="arcadeTitle" style="font-size:22px; margin:4px 0 2px;"></h2>
+    <p class="hint" id="arcadeSub" style="margin-top:0;"></p>
+    <div id="arcadeMount"></div>
+  </div>
+
+  <div class="view" id="view-settings">
+    <button class="back-btn" id="backFromSettings">&larr; Back</button>
+    <h2>Settings</h2>
+    <div class="settings-section">
+      <label class="field-label">Bible Version</label>
+      <div class="version-grid" id="versionGrid"></div>
+      <p class="hint">Select a Bible translation. Your choice is saved automatically.</p>
+    </div>
+
+    <div class="settings-section">
+      <label class="field-label">Appearance</label>
+      <div class="settings-row">
+        <span>Dark mode</span>
+        <button id="themeToggleSettings" class="theme-toggle" type="button">Dark mode</button>
+      </div>
+      <label class="field-label" style="margin-top:14px;">Text size</label>
+      <div class="segmented" id="textSizeTabs">
+        <button class="seg-btn" data-size="small">Small</button>
+        <button class="seg-btn" data-size="medium">Medium</button>
+        <button class="seg-btn" data-size="large">Large</button>
+      </div>
+      <p class="hint">Affects scripture and devotional reading text.</p>
+    </div>
+
+    <div class="settings-section" id="accountSection">
+      <label class="field-label">Account</label>
+      <div id="accountBody"></div>
+    </div>
+
+    <div class="settings-section">
+      <label class="field-label">Your data</label>
+      <p class="hint">Your data is always saved on this device. Sign in above to also back it up to your account, or export a backup file to keep it safe or move it to another device.</p>
+      <button class="secondary-btn" id="exportDataBtn" style="width:auto; padding:10px 16px; margin-right:8px;">Export my data</button>
+      <button class="secondary-btn" id="importDataBtn" style="width:auto; padding:10px 16px;">Import data</button>
+      <input type="file" id="importDataFile" accept="application/json" style="display:none;">
+      <p class="hint" id="dataStatus"></p>
+    </div>
+
+    <div class="settings-section">
+      <label class="field-label">Reset</label>
+      <p class="hint">Clears all reading progress, notes, devotionals, high scores, and friends on this device — and in your account too, if you're signed in. This can't be undone — export a backup first if you're not sure.</p>
+      <button class="secondary-btn" id="resetProgressBtn" style="width:auto; padding:10px 16px; color:var(--bad); border-color:var(--bad);">Reset all progress</button>
+    </div>
+  </div>
+
+  <div class="view" id="view-friends">
+    <h2 class="serif">Friends</h2>
+    <p class="hint">This is a personal list for now — it's saved with your account if you're signed in, but friends aren't linked accounts yet and nobody is notified automatically. Inviting and sharing use your phone or browser's own share sheet, so they work today even without a backend.</p>
+
+    <p class="section-heading">Invite a friend</p>
+    <p class="hint" style="margin-top:-6px;">Send someone a link to read along with you.</p>
+    <button class="primary-btn" id="inviteFriendBtn" style="width:auto; padding:10px 16px;">Invite a friend</button>
+
+    <p class="section-heading">Share a scripture</p>
+    <p class="hint" style="margin-top:-6px;">Pick a book and chapter, then choose one or more verses to send together.</p>
+    <div class="share-verse-row">
+      <select id="shareVerseBook"><option value="">Book&hellip;</option></select>
+      <select id="shareVerseChapter" disabled><option value="">Chapter&hellip;</option></select>
+    </div>
+    <div id="shareVerseList" class="share-verse-list"></div>
+    <button class="secondary-btn" id="shareVerseBtn" style="width:auto; padding:10px 16px;" disabled>Share selected verses</button>
+    <p class="hint" id="shareVerseStatus"></p>
+
+    <p class="section-heading">Your friends</p>
+    <div class="share-verse-row">
+      <input type="text" id="newFriendName" placeholder="Friend's name">
+      <input type="text" id="newFriendNote" placeholder="Note (optional)">
+    </div>
+    <button class="secondary-btn" id="addFriendBtn" style="width:auto; padding:10px 16px;">Add friend</button>
+    <div id="friendsList" style="margin-top:14px;"></div>
+  </div>
+
+</div>
+
+<!-- Fixed "Next" bar for the Story reading screen only (toggled in showView).
+     "Catch up" only appears when revisiting an already-completed chapter. -->
+<div class="story-read-nextbar" id="storyReadNextBar">
+  <div class="story-read-nextbar-inner">
+    <button class="secondary-btn" id="storyReadCatchUpBtn" type="button" style="display:none;">Catch up to where I left off &rarr;</button>
+    <button class="primary-btn" id="storyReadNextBtn" type="button">Next &rarr;</button>
+  </div>
+</div>
+
+<!-- Standalone devotional viewer, opened from the Library's Devotionals tab.
+     Deliberately does NOT touch Story navigation/progression — this is a
+     read-and-respond-anytime view, independent of where you've actually
+     gotten to in the story. -->
+<div class="modal-overlay" id="devotionalModal">
+  <div class="modal-card" id="devotionalModalCard" style="max-width:480px; max-height:80vh; overflow-y:auto; text-align:left;">
+    <button class="back-btn" id="closeDevotionalModal" style="margin-bottom:8px;">&larr; Close</button>
+    <div id="devotionalModalBody"></div>
+  </div>
+</div>
+
+<!-- Asked once, the first time Story mode is opened. -->
+<div class="modal-overlay" id="versionModal">
+  <div class="modal-card">
+    <p class="eyebrow" style="margin:0 0 4px;">Before we begin</p>
+    <h2 class="serif" style="margin:0 0 6px; font-size:20px;">Which Bible version would you like to use?</h2>
+    <p class="hint" style="margin:0 0 16px;">You can change this anytime in Settings.</p>
+    <div class="version-grid" id="versionModalGrid"></div>
+  </div>
+</div>
+
+<div class="bottom-nav">
+  <div class="bottom-actions">
+    <button class="icon-btn" data-tab="bible" title="Bible">&#128214;</button>
+    <button class="icon-btn" data-tab="hub" title="Library">&#128193;</button>
+    <button class="icon-btn story-btn" data-tab="story" title="Story">&#11088;</button>
+    <button class="icon-btn" data-tab="friends" title="Friends">&#128101;</button>
+    <button class="icon-btn" data-tab="settings" title="Settings">&#9881;&#65039;</button>
+  </div>
+</div>
+
+<script src="js/data.js?v=3"></script>
+<script src="js/storage.js?v=8"></script>
+<script src="js/games/registry.js?v=1"></script>
+<script src="js/games.js?v=5"></script>
+<script src="js/games/arcade-engine.js?v=3"></script>
+<script src="js/games/wordgames.js?v=6"></script>
+<script src="js/games/creationsort.js?v=3"></script>
+<script src="js/games/gardentrail.js?v=5"></script>
+<script src="js/games/farmplot.js?v=5"></script>
+<script src="js/games/connectdots.js?v=2"></script>
+<script src="js/games/sudoku.js?v=1"></script>
+<script src="js/games/crossword.js?v=3"></script>
+<script src="js/games/slingshot.js?v=1"></script>
+<script src="js/games/flappy.js?v=1"></script>
+<script src="js/games/runner.js?v=1"></script>
+<script src="js/games/frogger.js?v=1"></script>
+<script src="js/games/pacman.js?v=1"></script>
+<script src="js/games/galaga.js?v=1"></script>
+<script src="js/games/towerdefense.js?v=1"></script>
+<script src="js/bible.js?v=6"></script>
+<script src="js/chapterquiz.js?v=1"></script>
+<script src="js/notes.js?v=5"></script>
+<script src="js/story-data.js?v=11"></script>
+<script src="js/story.js?v=6"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.108.2"></script>
+<script src="js/cloud.js?v=1"></script>
+<script src="js/app.js?v=17"></script>
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.getRegistrations().then(registrations => {
+      registrations.forEach(reg => reg.unregister());
+    }).catch(() => {});
+    navigator.serviceWorker.register('sw.js').catch(() => {});
+  }
+</script>
+</body>
+</html>
