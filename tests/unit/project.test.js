@@ -168,6 +168,11 @@ test('deploy workflow: nothing is published unless every test passed', () => {
   assert.equal((y.match(/actions\/deploy-pages@/g) || []).length, 1, 'exactly one step may publish');
   assert.ok(!/actions\/deploy-pages@/.test(jobs.test), 'the test job must never publish');
 
+  // The job that installs the test browser must pin an Ubuntu version Playwright supports.
+  // "ubuntu-latest" moves to new Ubuntu releases on GitHub's schedule, and a new release can
+  // break the browser install overnight (it did, at Ubuntu 26.04).
+  assert.match(jobs.test, /^\s{4}runs-on:\s*ubuntu-\d\d\.\d\d\s*$/m, 'the test job must use a pinned runner like ubuntu-24.04, not ubuntu-latest');
+
   // The test job runs every kind of test, in order, before it packages anything.
   const order = ['npm run test:unit', 'npm run test:e2e', 'npm run build', '--grep @smoke', 'actions/upload-pages-artifact@']
     .map(step => ({ step, at: jobs.test.indexOf(step) }));

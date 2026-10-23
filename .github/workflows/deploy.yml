@@ -28,7 +28,11 @@ concurrency:
 jobs:
   test:
     name: Test
-    runs-on: ubuntu-latest
+    # Pinned on purpose. "ubuntu-latest" now means Ubuntu 26.04, which the Playwright
+    # version in package.json (1.56) cannot install a browser on. Ubuntu 24.04 works.
+    # When you upgrade Playwright to a release that supports 26.04, this can go back to
+    # ubuntu-latest.
+    runs-on: ubuntu-24.04
     timeout-minutes: 25
     steps:
       - name: Get the code
@@ -43,15 +47,15 @@ jobs:
         run: |
           if [ -f package-lock.json ]; then npm ci; else npm install --no-audit --no-fund; fi
 
-      - name: Install the test browser
-        run: npx playwright install --with-deps chromium
-
       # Fast checks first: merge rules, story data, storage, project guards.
       # STRICT_LICENSES makes copyrighted Bible text in git a hard failure.
       - name: Unit and project checks
         run: npm run test:unit
         env:
           STRICT_LICENSES: '1'
+
+      - name: Install the test browser
+        run: npx playwright install --with-deps chromium
 
       # The whole app in a real browser (Story, Bible, Library, Friends,
       # Settings, every game, sign-in and syncing against a fake Supabase).
