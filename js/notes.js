@@ -204,7 +204,7 @@ const VerseNotes = {
       <div id="verseNotesList">${sorted.length ? '' : '<p class="hint">No verse notes yet. Head to Scripture, tap a verse, then the +.</p>'}</div>
       <label class="field-label" style="margin-top:22px;">General notes</label>
       <textarea id="notesArea" placeholder="Paste in what we discussed for this chapter, or jot your own notes here.">${Storage.state.notes[k] || ''}</textarea>
-      <p class="hint">Notes save automatically on this device.</p>`;
+      <p class="hint">Notes save automatically on this device, and sync to your account when you are signed in.</p>`;
 
     const list = container.querySelector('#verseNotesList');
     sorted.forEach(n => {

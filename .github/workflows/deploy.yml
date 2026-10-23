@@ -1,0 +1,151 @@
+# Test, then deploy to GitHub Pages.
+#
+#   Every push to any branch, and every pull request  ->  run all the tests
+#   A push to main, and ONLY if every test passed      ->  publish to GitHub Pages
+#
+# The deploy job cannot start unless the test job succeeded ("needs: test"), and
+# it publishes the exact build that was tested, not a fresh one. After
+# publishing, a final job checks the live site.
+#
+# One-time setup in GitHub: Settings -> Pages -> Build and deployment ->
+# Source: "GitHub Actions". See docs/TESTING.md.
+name: Test and deploy
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  # Never cancel a run that is publishing from main; cancel stale runs elsewhere.
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
+jobs:
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Get the code
+        uses: actions/checkout@v6
+
+      - name: Set up Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+
+      - name: Install dependencies
+        run: |
+          if [ -f package-lock.json ]; then npm ci; else npm install --no-audit --no-fund; fi
+
+      - name: Install the test browser
+        run: npx playwright install --with-deps chromium
+
+      # Fast checks first: merge rules, story data, storage, project guards.
+      # STRICT_LICENSES makes copyrighted Bible text in git a hard failure.
+      - name: Unit and project checks
+        run: npm run test:unit
+        env:
+          STRICT_LICENSES: '1'
+
+      # The whole app in a real browser (Story, Bible, Library, Friends,
+      # Settings, every game, sign-in and syncing against a fake Supabase).
+      - name: Browser tests (full)
+        run: npm run test:e2e
+
+      # Build what would be published, then run the quick smoke tests against
+      # that build, so we know the published files themselves work.
+      - name: Build the site
+        run: npm run build
+
+      - name: Browser tests (smoke) against the built site
+        run: npx playwright test --grep @smoke
+        env:
+          SERVE_DIR: _site
+
+      - name: Keep the test report if something failed
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: test-report
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 7
+          if-no-files-found: ignore
+
+      - name: Package the tested site for publishing
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: actions/upload-pages-artifact@v5
+        with:
+          path: _site
+
+  deploy:
+    name: Deploy to GitHub Pages
+    needs: test                       # <- nothing is published unless every test passed
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      pages: write
+      id-token: write
+    concurrency:
+      group: pages
+      cancel-in-progress: false
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    outputs:
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Publish
+        id: deployment
+        uses: actions/deploy-pages@v5
+
+  verify-live:
+    name: Check the live site
+    needs: deploy
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    env:
+      PAGE_URL: ${{ needs.deploy.outputs.url }}
+    steps:
+      - name: Check the published site
+        run: |
+          set -euo pipefail
+          BASE="${PAGE_URL%/}"
+          fail() { echo "::error::$1"; exit 1; }
+
+          ok=""
+          for attempt in 1 2 3 4 5 6 7 8 9 10 11 12; do
+            if curl -fsS --max-time 20 "$BASE/index.html" -o /tmp/index.html 2>/dev/null; then ok=1; break; fi
+            echo "Waiting for the new version to go live (attempt $attempt)..."
+            sleep 10
+          done
+          [ -n "$ok" ] || fail "The site did not come online at $BASE"
+
+          grep -q 'js/app.js' /tmp/index.html || fail "index.html does not load js/app.js"
+
+          size=$(curl -fsS --max-time 20 "$BASE/js/app.js" | wc -c)
+          [ "$size" -gt 20000 ] || fail "js/app.js is only $size bytes: it looks empty or truncated"
+
+          curl -fsS --max-time 20 "$BASE/sw.js" -o /dev/null || fail "sw.js is missing"
+
+          # Only public-domain text may be live (change this if you publish more).
+          avail="$(curl -fsS --max-time 20 "$BASE/versions/available.json")"
+          [ "$avail" = '["KJV"]' ] || fail "versions/available.json says $avail; expected [\"KJV\"]"
+
+          curl -fsS --max-time 20 "$BASE/versions/KJV/01-Genesis/Chapters/Genesis-1.json" | grep -q '"verses"' \
+            || fail "KJV Genesis 1 did not load from the live site"
+
+          code="$(curl -s -o /dev/null -w '%{http_code}' --max-time 20 "$BASE/versions/ESV/Genesis-1.json")"
+          [ "$code" = "404" ] || fail "copyrighted text is reachable on the live site (HTTP $code)"
+
+          echo "Live site looks healthy: $BASE"

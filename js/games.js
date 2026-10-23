@@ -105,18 +105,18 @@ function runQuiz(mountEl, quiz, onDone) {
 // actually exist into one shared pool, with a toggle for "only chapters
 // I've read" vs "everything imported so far."
 function gameDataChapterKeys(scope) {
-  return Object.keys(Storage.state.gameData).filter(k => scope === 'all' || Storage.state.progress[k]);
+  return Object.keys(Storage.allPacks()).filter(k => scope === 'all' || Storage.state.progress[k]);
 }
 
 function emptyPoolMessage(scope, kind) {
   const scopeNote = scope === 'read' ? " from chapters you've read" : '';
-  return `<p class="hint">No ${kind} available yet${scopeNote}. Import a game pack from a chapter's Game tab in the Bible tab, or switch to "All chapters."</p>`;
+  return `<p class="hint">No ${kind} available yet${scopeNote}. Switch to "All chapters," or import a game pack from a chapter's Game tab in the Bible tab."</p>`;
 }
 
 GameRegistry.register({
   id: 'matching',
   title: 'Matching',
-  sub: 'Match pairs pulled from your imported chapter packs',
+  sub: 'Match pairs pulled from the chapter game packs',
   mount(container) {
     let scope = 'read';
     const wrap = document.createElement('div');
@@ -124,8 +124,9 @@ GameRegistry.register({
 
     function pool() {
       const pairs = [];
+      const packs = Storage.allPacks();
       gameDataChapterKeys(scope).forEach(k => {
-        (Storage.state.gameData[k].sections || []).forEach(sec => {
+        (packs[k].sections || []).forEach(sec => {
           (sec.matching.pairs || []).forEach(p => pairs.push(p));
         });
       });

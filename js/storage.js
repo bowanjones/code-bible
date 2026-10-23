@@ -207,6 +207,18 @@ const Storage = {
     return (this.state.friends || []).slice().sort((a, b) => a.name.localeCompare(b.name));
   },
 
+  // Game packs: the ones that ship with the app (BUILTIN_PACKS) plus any the
+  // reader imported. An imported pack for a chapter replaces the built-in one.
+  getPack(key) {
+    const own = this.state.gameData[key];
+    if (own) return own;
+    return (typeof BUILTIN_PACKS !== 'undefined' && BUILTIN_PACKS[key]) || null;
+  },
+
+  allPacks() {
+    return Object.assign({}, typeof BUILTIN_PACKS !== 'undefined' ? BUILTIN_PACKS : {}, this.state.gameData);
+  },
+
   importGamePack(book, chapter, jsonText) {
     const parsed = JSON.parse(jsonText); // throws on invalid JSON — caller should catch
     this.state.gameData[this.key(book, chapter)] = parsed;

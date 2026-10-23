@@ -33,18 +33,33 @@ js/games.js                  matching-game + quiz rendering engine (per-chapter 
 js/games/registry.js          GameRegistry — every word/puzzle/arcade game registers here
 js/games/arcade-engine.js     shared canvas/input/HUD toolkit for arcade games
 js/games/wordgames.js         fill-in-the-blank, word search, unscramble, memory match
+js/arcs/genesis-10-50.js       Story arcs for Genesis 10-50 (added to STORY_ARCS)
 js/story-data.js               STORY_ARCS (the campaign spine) + StoryEngine (unlock/
                                 progress logic)
 js/story.js                    rendering for the Story tab and arc-detail view
 js/app.js                       top-level tab navigation, chapter detail rendering,
                                   and the bridge that lets a Story beat open a game or
                                   chapter and mark itself complete when you're done
+js/packs/genesis.js           built-in game packs for Genesis 2-50 (matching + quiz per chapter)
+js/cloud.js                    optional account sign-in + cloud backup/sync (Supabase)
 docs/GAME_PACK_FORMAT.md  spec for the per-chapter game-pack JSON, plus roadmap notes
+docs/SUPABASE_SETUP.md    one-time database + sign-in setup
+docs/TESTING.md           how to run and extend the tests, and how deploys work
+supabase/schema.sql       database tables and security rules
+tests/unit, tests/e2e     unit tests (Node) and full-app browser tests (Playwright)
+scripts/build-site.js     builds the folder that gets published to GitHub Pages
+.github/workflows/        deploy.yml (test, then publish) and supabase-keepalive.yml
 ```
 
 ## Extending Story mode
 
-Add or edit arcs/beats in `js/story-data.js`. Each arc is a title + chapter range + an
+Genesis is complete: 15 arcs covering chapters 1-50 (`js/story-data.js` has the first three,
+`js/arcs/genesis-10-50.js` the rest). To add the next book, copy the shape of
+`js/arcs/genesis-10-50.js`, load it in `index.html` and `sw.js` right after it, and add it to
+`tests/unit/helpers/load.js`; `tests/unit/arcs.test.js` and `tests/e2e/arcs.spec.js` then check it
+automatically.
+
+Add or edit arcs/beats in those files. Each arc is a title + chapter range + an
 ordered list of beats. A beat is either:
 
 - `{ type: 'read', chapters: [[book, chapter]], label }` — completes automatically the
@@ -92,14 +107,28 @@ Then visit `http://localhost:8000`.
   built. Arcade games (David's Slingshot, Flappy Dove, Exodus Escape, Jordan Crossing,
   Manna Maze, Armor of God, Jericho Defense) are stubbed as "coming soon" in the registry
   but not yet implemented.
-- Story mode has 6 arcs seeded (Creation, the Flood, the Exodus, the Wilderness, Jericho,
-  David & Goliath) as a template for continuing through the rest of the Bible.
-- Progress, notes, game packs, and story-beat completion are stored in `localStorage` —
-  local to one browser/device.
+- Story mode now covers all of Genesis (Creation through Joseph in Egypt, 15 arcs). Next up:
+  Exodus onward, using the same arc shape.
+- Progress, notes, game packs, and story-beat completion are always saved in
+  `localStorage` on the device. Signing in (Settings > Account) also backs them up to a
+  private account and keeps your devices in sync.
 
 ## Roadmap
 
 See the bottom of `docs/GAME_PACK_FORMAT.md`. Short version: build out the remaining
 arcade games, move game packs into committed JSON files instead of paste-to-import, pull
-real scripture text via API for in-app reading, and eventually add real cross-device sync
-(which would also unlock real Friends features beyond a placeholder).
+real scripture text via API for in-app reading, and build real Friends features on top of the
+new accounts (shared progress, linked friends).
+
+## Tests and deploying
+
+```
+npm install                  once, then:   npx playwright install chromium
+npm test                     everything (unit + browser tests)
+npm run test:unit            fast checks, no browser
+npm run test:e2e             the whole app in a real browser
+npm run build                builds the publishable site into _site/
+```
+
+Pushing to GitHub runs all of this automatically; a push to `main` is published to
+GitHub Pages only if every test passes. Details in `docs/TESTING.md`.

@@ -3,6 +3,15 @@ Thumbs.db
 node_modules/
 .vscode/
 *.log
+
+# Test and build output
+_site/
+test-results/
+playwright-report/
+blob-report/
+
+# Copyrighted Bible translations: keep them on your own machine, never in git.
+# Only the public-domain KJV is committed and published.
 versions/NIV/
 versions/ESV/
 versions/NLT/
