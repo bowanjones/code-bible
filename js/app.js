@@ -197,10 +197,10 @@ function applyTextSize(size) {
 
 function fillVersionGrid(grid, onPick) {
   grid.innerHTML = '';
-  BIBLE_VERSIONS.forEach(version => {
+  Bible.versionChoices(BIBLE_VERSIONS).forEach(version => {
     const btn = document.createElement('button');
     btn.type = 'button';
-    btn.className = 'version-btn' + (Storage.state.bibleVersion === version ? ' active' : '');
+    btn.className = 'version-btn' + (Bible.activeVersion() === version ? ' active' : '');
     btn.textContent = version;
     btn.onclick = () => onPick(version, grid);
     grid.appendChild(btn);
@@ -425,7 +425,7 @@ function renderChapterList() {
   for (let c = 1; c <= count; c++) {
     const key = Storage.key(book, c);
     const done = !!Storage.state.progress[key];
-    const hasPack = !!Storage.state.gameData[key];
+    const hasPack = !!Storage.getPack(key);
     const row = document.createElement('div');
     row.className = 'row';
     row.innerHTML = `
@@ -462,7 +462,7 @@ function goToChapterTab(book, chapter, tab, beat) {
 function renderDetail() {
   const { book, chapter } = nav;
   const key = Storage.key(book, chapter);
-  $('detailMeta').textContent = `Chapter ${chapter} of ${chapterCount(book)} \u00B7 ${Storage.state.bibleVersion}`;
+  $('detailMeta').textContent = `Chapter ${chapter} of ${chapterCount(book)} \u00B7 ${Bible.activeVersion()}`;
 
   document.querySelectorAll('#detailTabs .seg-btn').forEach(b => {
     b.classList.toggle('active', b.dataset.tab === nav.detailTab);
@@ -513,7 +513,7 @@ function renderDetail() {
 // exists, an auto-generated quiz from the chapter text, and the import box.
 function renderChapterGame(container, book, chapter) {
   const key = Storage.key(book, chapter);
-  const pack = Storage.state.gameData[key];
+  const pack = Storage.getPack(key);
   container.innerHTML = '';
 
   if (pack) {
@@ -955,7 +955,7 @@ function onShareChapterChosen() {
       list.appendChild(label);
     });
   }).catch(() => {
-    list.innerHTML = `<p class="hint">Couldn\u2019t load ${escapeText(book)} ${chapter} in ${escapeText(Storage.state.bibleVersion)}.</p>`;
+    list.innerHTML = `<p class="hint">Couldn\u2019t load ${escapeText(book)} ${chapter} in ${escapeText(Bible.activeVersion())}.</p>`;
   });
 }
 
@@ -967,7 +967,7 @@ async function shareSelectedVerses() {
   const data = await Bible.fetchChapter(book, chapter);
   const wanted = new Set(checked);
   const text = data.verses.filter(v => wanted.has(v.verse)).map(v => v.text.trim()).join(' ');
-  const ref = `${book} ${chapter}:${formatVerseList(checked)} (${Storage.state.bibleVersion})`;
+  const ref = `${book} ${chapter}:${formatVerseList(checked)} (${Bible.activeVersion()})`;
   const result = await shareOrCopy({ title: ref, text: `\u201C${text}\u201D \u2014 ${ref}` });
   $('shareVerseStatus').textContent =
     result === 'copied' ? 'Copied to your clipboard.' :
@@ -1083,7 +1083,10 @@ function init() {
   $('shareVerseChapter').onchange = onShareChapterChosen;
   $('shareVerseBtn').onclick = shareSelectedVerses;
 
-  showTab('story');
+  // Learn which Bible versions this site ships before the first screen draws
+  // (capped so a slow network can never block the app from starting).
+  Promise.race([Bible.loadAvailableVersions(), new Promise(r => setTimeout(r, 1500))])
+    .then(() => showTab('story'));
 }
 
 document.addEventListener('DOMContentLoaded', init);

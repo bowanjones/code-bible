@@ -1,12 +1,13 @@
-const CACHE_NAME = 'code-bible-v23';
+const CACHE_NAME = 'code-bible-v25';
 const CACHE_URLS = [
   '.',
   'index.html',
   'manifest.json',
   'css/style.css?v=16',
-  'js/data.js?v=3',
-  'js/storage.js?v=8',
-  'js/games.js?v=5',
+  'js/data.js?v=4',
+  'js/packs/genesis.js?v=1',
+  'js/storage.js?v=9',
+  'js/games.js?v=6',
   'js/games/registry.js?v=1',
   'js/games/arcade-engine.js?v=3',
   'js/games/wordgames.js?v=6',
@@ -25,11 +26,12 @@ const CACHE_URLS = [
   'js/games/towerdefense.js?v=1',
   'js/bible.js?v=6',
   'js/chapterquiz.js?v=1',
-  'js/notes.js?v=5',
-  'js/story-data.js?v=11',
+  'js/notes.js?v=6',
+  'js/story-data.js?v=12',
+  'js/arcs/genesis-10-50.js?v=1',
   'js/story.js?v=6',
   'js/cloud.js?v=1',
-  'js/app.js?v=17'
+  'js/app.js?v=18'
 ];
 
 self.addEventListener('install', event => {

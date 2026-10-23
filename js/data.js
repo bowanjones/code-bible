@@ -58,3 +58,7 @@ const SEED_GAME = {
     ]
   }
 };
+
+// Every game pack that ships with the app, keyed "Book-Chapter". Files in
+// js/packs/ add to this. A pack the reader imports for the same chapter wins.
+const BUILTIN_PACKS = Object.assign({}, SEED_GAME);

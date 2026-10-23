@@ -1,7 +1,35 @@
 const Bible = {
   cache: {},
+
+  // Which Bible versions this copy of the site actually ships. null means
+  // "assume all of them" (local development). The deployed site lists what it
+  // contains in versions/available.json, because only public-domain text
+  // (KJV) is published; copyrighted translations stay on your own machine.
+  availableVersions: null,
+
+  loadAvailableVersions() {
+    return fetch('versions/available.json')
+      .then(r => (r.ok ? r.json() : null))
+      .then(list => {
+        if (Array.isArray(list) && list.length) { this.availableVersions = list; this.cache = {}; }
+      })
+      .catch(() => { /* no list present: keep assuming everything is available */ });
+  },
+
+  // The version whose text will really load. If the saved choice isn't shipped
+  // here (e.g. synced from a dev machine that has ESV), fall back gracefully.
+  activeVersion() {
+    const saved = (Storage.state && Storage.state.bibleVersion) || 'KJV';
+    if (this.availableVersions && !this.availableVersions.includes(saved)) return this.availableVersions[0];
+    return saved;
+  },
+
+  versionChoices(all) {
+    return this.availableVersions ? all.filter(v => this.availableVersions.includes(v)) : all.slice();
+  },
+
   async fetchChapter(book, chapter) {
-    const version = Storage.state.bibleVersion || 'KJV';
+    const version = this.activeVersion();
     const key = `${book}-${chapter}-${version}`;
     if (this.cache[key]) return this.cache[key];
 

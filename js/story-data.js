@@ -159,17 +159,47 @@ const STORY_ARCS = [
           question: "Is there something God has asked you to prepare for or obey, even if you don't yet see the reason why?"
         } },
       { id: 'gen6b-game', type: 'game', gameId: 'fillblank', label: 'Play: fill in the blank' },
-      { id: 'gen7-read', type: 'read', chapters: [['Genesis', 7]], label: 'Read Genesis 7 — the flood comes' },
-      { id: 'gen8-read', type: 'read', chapters: [['Genesis', 8]], label: 'Read Genesis 8 — the waters recede' },
-      { id: 'gen9-read', type: 'read', chapters: [['Genesis', 9]], label: 'Read Genesis 9 — the rainbow covenant' },
-      { id: 'flood-memory', type: 'game', gameId: 'memorymatch', label: 'Play: memory match' }
+      { id: 'gen7-read', type: 'read', chapters: [['Genesis', 7]], label: 'Read Genesis 7 — the flood comes',
+        devotional: {
+          reflection: 'The chapter repeats a quiet detail: Noah did "according unto all that God commanded him." Then comes the line that steadies everything: "and the LORD shut him in." God both asks for obedience and provides the safety.',
+          question: "Where do you need to trust that God has you 'shut in' safely while the storm is still raging?"
+        } },
+      { id: 'gen8-read', type: 'read', chapters: [['Genesis', 8]], label: 'Read Genesis 8 — the waters recede',
+        devotional: {
+          reflection: '"And God remembered Noah." The waters go down slowly, over months, and Noah waits, sending out a raven and then a dove and taking his time before leaving the ark. When he finally steps out, the first thing he builds is an altar.',
+          question: "What does it look like for you to wait on God's timing, and to answer first with worship when a hard season ends?"
+        } },
+      { id: 'gen9-read', type: 'read', chapters: [['Genesis', 9]], label: 'Read Genesis 9 — the rainbow covenant',
+        devotional: {
+          reflection: 'God sets a bow in the clouds as the sign that he will never again destroy the earth with a flood. The promise is for every living creature, and it comes without conditions. The same chapter shows Noah\'s family still struggling after the flood: new ground, same human hearts.',
+          question: "What reminder of God's faithfulness, a 'rainbow' of your own, can you set in your life?"
+        } },
+      { id: 'flood-memory', type: 'game', gameId: 'memorymatch', label: 'Play: memory match' },
+
+      { id: 'flood-summary', type: 'summary', label: 'Genesis 6-9: The Big Picture',
+        recap: "As human wickedness fills the earth, God grieves, yet Noah finds grace. God tells him how to build the ark, and Noah obeys. The flood covers the earth, God remembers Noah, and the waters recede. Noah worships, and God makes a covenant with every living creature, sealing it with the rainbow. Judgment and mercy meet in the same story: the world is cleansed, and a family is carried through.",
+        devotional: {
+          reflection: "From corruption to covenant: the flood story shows a God who takes evil seriously and who also keeps his creatures safe.",
+          question: "Where do you see both God's seriousness about wrong and his mercy toward people in this story?"
+        } },
+
+      { id: 'flood-finale', type: 'game', gameId: 'crossword', label: 'Finale: crossword — Noah and the flood',
+        crossword: [
+          { word: 'ARARAT', clue: 'The mountains where the ark came to rest', row: 0, col: 0, dir: 'across' },
+          { word: 'RAVEN', clue: 'The first bird Noah sent out', row: 0, col: 3, dir: 'down' },
+          { word: 'DOVE', clue: 'The bird that returned with an olive leaf', row: 2, col: 1, dir: 'across' },
+          { word: 'ARK', clue: 'The vessel God told Noah to build', row: 3, col: 0, dir: 'down' },
+          { word: 'NOAH', clue: 'Who “found grace in the eyes of the LORD” (Genesis 6:8)', row: 3, col: 5, dir: 'down' },
+          { word: 'RAINBOW', clue: 'The sign of God’s covenant never to flood the earth again', row: 4, col: 0, dir: 'across' },
+          { word: 'PITCH', clue: 'What Noah used to seal the ark, inside and out', row: 6, col: 1, dir: 'across' }
+        ] }
     ]
   }
-  // More arcs go here as we design them — one at a time, each with its own
-  // reading breaks and an activity tailored to what was just read. Nothing
-  // beyond Genesis yet on purpose; the games below (runner, pacman, frogger,
-  // slingshot, etc.) still work fine as free play from the Library in the
-  // meantime, they're just not wired to a beat until their arc is written.
+  // More arcs live in js/arcs/ (Genesis 10-50 is in js/arcs/genesis-10-50.js). To add
+  // one, copy that file's shape, load it in index.html and sw.js right after this file,
+  // and list it in tests/unit/helpers/load.js. The arcade games still marked "In the
+  // works" (runner, pacman, frogger, slingshot, etc.) work as free play from the Library
+  // and aren't wired to a stop until they're built.
 ];
 
 const StoryEngine = {

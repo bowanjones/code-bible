@@ -1,0 +1,18 @@
+{
+  "name": "code-bible",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Code Bible - a gamified Bible-reading PWA. Dev tooling only: the app itself has no build step and no runtime dependencies.",
+  "engines": { "node": ">=22" },
+  "scripts": {
+    "serve": "node tests/serve.js",
+    "build": "node scripts/build-site.js",
+    "test:unit": "node --test \"tests/unit/**/*.test.js\"",
+    "test:e2e": "playwright test",
+    "test": "npm run test:unit && npm run test:e2e",
+    "playwright:install": "playwright install chromium"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.56.0"
+  }
+}
